@@ -33,7 +33,9 @@ public class App
         try {
             /*Member member = new Member();
             member.setId(2L);
-            member.setName("HelloB");*/
+            member.setName("HelloB");
+           실무에서는 setter 잘 안쓰고 생성자 빌더로 함
+            */
 
             //Member member = em.find(Member.class, 2L);
             /*System.out.println(member.getId() + member.getName());
@@ -91,6 +93,28 @@ public class App
             for(Member m : members){
 
             }
+             */
+
+            /*
+                일대다 단방향 단점
+                - 엔티티가 관리하는 외래 키가 다른 테이블에 있음 ( 관계 테이블상 "다" 쪽에 외래키가 있음 )
+                - 연관관계 관리를 위해 추가로 UPDATE SQL을 실행 ( 외래키가 반대쪽에 있기 때문에 )
+
+                따라서 일대다 단방향 매핑보다는 다대일 양방향 매핑을 사용하자
+             */
+            /*
+                일대일 관계
+                    - 주 테이블에 외래키 (Member)
+                        -  주 객체가 대상 객체의 참조를 가지는 것 처럼 주 테이블에 외래 키를 두고 대상 테이블을 찾음
+                        - 객체지향 개발자 선호
+                        - JPA 매핑 편리
+                        - 장점 : 주 테이블만 조회해도 대상 테이블에 데이터가 있는지 확인 가능
+                        - 단점 : 값이 없으면 외래 키에 null 허용
+
+                    - 대상 테이블에 외래 키 (Locker)
+                        - 대상 테이블에 외래 키가 존재
+                        - 장점 : 주 테이블과 대상 테이블을 일대일에서 일대다 관계로 변경할 때 테이블 구조 유지
+                        - 단점 : 프록시 기능의 한계로 지연 로딩으로 설정해도 항상 즉시 로딩됨
              */
 
             tx.commit();
