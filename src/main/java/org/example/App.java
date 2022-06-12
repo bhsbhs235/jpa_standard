@@ -1,5 +1,7 @@
 package org.example;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -121,8 +123,71 @@ public class App
                 연결 테이블을 엔티티 추가
                 @ManyToMany -> @OneToMany, @ManyToOne
              */
+            /*
+            Member member = new Member();
+            member.setName("Hyoseong");
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            //Member findMember = em.find(Member.class, member.getId()); // 즉시 쿼리를 조회함
+            Member findMember = em.getReference(Member.class, member.getId()); // 가짜 객체(프록시 객체)를 조회, 값이 없을 때 조회함
+            /*
+                프록시 특징
+                - 실제 클래스를 상속 받아서 만들어짐
+                - 실제 클래스와 겉모양이 같다
+                - 사용하는 입장에서는 진짜 객체인지 프록시 객체인지 구분하지 않고 사용하면 됨(이론상)
+
+                *중요
+                - 프록시 객체는 처음 사용할 때 한번만 초기화
+                - 프록시 객체를 초기화 할 때, 프록시 객체가 실제 엔티티로 바뀌는 것은 아님, 초기화되면 프록시 객체(가짜 객체)를 통해서 실제 엔티티에 접근 가능
+                - 프록시 객체는 원본 엔티티를 상속받음, 따라서 타입 체크시 주의해야함 (instance of 사용 , == 실패)
+                - 영속성 컨텍스트에 찾는 엔티티가 이미 있으면 em.getReference()를 호출해도 실제 엔티티 반환 ( 이 말은 == 해도 true 같은 타입이라는뜻 프록시 객체 X)
+                  JPA 메커니즘이 영속성 컨텍스트에 있는 것들은 같게 해줘야함
+                - 영속성 컨텍스트의 도움을 받을 수 없는 준영속 상태일 때, 프록시를 초기화하는 문제 발생 ( LazyInitializationException )
+             */
+            /*
+            System.out.println(findMember.getClass()); // HibernateProxy 객체
+            System.out.println(findMember.getId());
+            System.out.println(findMember.getName());
+
+            //em.detach(findMember);
+            em.clear();
+
+            //findMember.getName(); // LazyInitializationException
+            System.out.println(emf.getPersistenceUnitUtil().isLoaded(findMember)); // false
+            findMember.getName();
+            // 또는 Hibernate.initialize(findMember);
+            System.out.println(emf.getPersistenceUnitUtil().isLoaded(findMember)); // true
 
             tx.commit();
+            */
+            /*
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setName("hyoseong");
+            member.setTeam(team);
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            Member m = em.find(Member.class, member.getId());
+            // List<Member> members = em.createQuery("select m from Member m", Member.class).getResultList();
+            // select * from member, select * from team 두번 나감 매핑 되어있는 만큼 select를 조회
+            // List<Member> members = em.createQuery("select m from Member m join fetch m.team", Memer.class).getResultList();
+
+            System.out.println(m.getTeam().getClass()); // 프록시 객체
+
+            m.getTeam().getName(); // 실제 Team을 사용하는 시점에 조회
+            */
+
+
         }catch (Exception e){
             tx.rollback();
         } finally {

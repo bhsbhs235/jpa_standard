@@ -1,17 +1,19 @@
 package org.example;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED) // 없으면 단일 테이블 방식 ( 한 테이블(Item)에 Book, Movie 컬럼이 들어간다)
 @DiscriminatorColumn(name = "D_TYPE") //( DTYPE 생성 - 없어도 운영상에 에러는 없지만 편의상 있는게 좋다 )
-public class Item {
-
+public class Item extends BaseEntity {
+// abstract 추상 클래스로 하면 직접적으로 생성하는 것을 막을수 있다. 조회할 일 없는 테이블에 붙이면 된다.
     @Id @GeneratedValue
     private Long id;
 
     private String name;
     private int price;
+
 }
 /*
     JPA 장점
