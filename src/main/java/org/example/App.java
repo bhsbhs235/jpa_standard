@@ -186,7 +186,7 @@ public class App
 
             m.getTeam().getName(); // 실제 Team을 사용하는 시점에 조회
             */
-
+            /*
             Child child1 = new Child();
             Child child2 = new Child();
 
@@ -202,6 +202,46 @@ public class App
             Parent findParent = em.find(Parent.class, parent.getId());
             //em.remove(findParent);
             findParent.getChildList().remove(0); // orphanRemoval = true 일 때, 동작함
+            */
+
+            /*User user = new User();
+            user.setUsername("hello");
+            user.setAddress(new Address("city", "street", "zipcode"));
+            user.setPeriod(new Period());
+
+            em.persist(user);*/
+
+            Address address = new Address("city", "street", "zipcode");
+            User user = new User();
+            user.setUsername("hello");
+            user.setAddress(address);
+            user.setPeriod(new Period());
+
+            Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+            User user2 = new User();
+            user2.setUsername("hello");
+            //user2.setAddress(address);
+            user2.setAddress(copyAddress); //복사해서 쓰자
+            user2.setPeriod(new Period());
+
+            em.persist(user);
+
+            // user.getAddress().setCity("newCity"); // user 만 바꾸려고 했는데 user2 까지 바뀜 Setter 를 없애자
+            /*
+                int a = 10;
+                int b = a;
+                a = 20;
+                해도 b 값 안바뀜 값이 복사되서 들어가니깐
+
+                대충
+                Address a = new Address(10);
+                Address b = a;
+                a.setValue(20);
+                b도 바뀜 클래스는 주소로 참조하기 때문에
+                따라서 임베디드 타입도 같이 변경됨
+                참고 Integer, String 도 클래스이며 공유참조가 된다 하지만 불변 객체로 값을 수정할 수 없게 하여 사이드 이팩트를 원천 차단한다.
+             */
+            em.persist(user2);
 
             tx.commit();
 
