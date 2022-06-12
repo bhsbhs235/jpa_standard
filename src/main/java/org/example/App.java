@@ -187,6 +187,23 @@ public class App
             m.getTeam().getName(); // 실제 Team을 사용하는 시점에 조회
             */
 
+            Child child1 = new Child();
+            Child child2 = new Child();
+
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
+
+            em.persist(parent);
+
+            em.flush();
+            em.clear();
+
+            Parent findParent = em.find(Parent.class, parent.getId());
+            //em.remove(findParent);
+            findParent.getChildList().remove(0); // orphanRemoval = true 일 때, 동작함
+
+            tx.commit();
 
         }catch (Exception e){
             tx.rollback();

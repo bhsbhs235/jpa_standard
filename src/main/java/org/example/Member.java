@@ -51,7 +51,7 @@ public class Member {
     private int temp;
 
     @ManyToOne(fetch = FetchType.LAZY) // 지연 로딩으로 프로시로 조회, 굳이 Team정보를 조회할 경우가 별로 없을 때 ( 가급적이면 지연 로딩으로 쓰자 필요없을 때도 예상하지 못한 sql이 발생할 수도 있회)
-    @JoinColumn(name = "team_id") // N:1 일 때, N인 객체 테이블 모델에서 외래키가 있는 객체가 연관간계 주인이다
+    @JoinColumn(name = "team_id") // N:1 일 때, N인 객체 테이블 모델에서 외래키가 있는 객체가 연관간계 주인이다 name = 외래키 컬럼이름
     private Team team;
 
     // 양방향 연관관계 양쪽값 설정 메소드
