@@ -241,6 +241,19 @@ public class App
                 따라서 임베디드 타입도 같이 변경됨
                 참고 Integer, String 도 클래스이며 공유참조가 된다 하지만 불변 객체로 값을 수정할 수 없게 하여 사이드 이팩트를 원천 차단한다.
              */
+            /*
+                int a = 10;
+                int b = 10;
+                a == b true
+
+                Address address1 = new Address("city");
+                Address address2 = new Address("city");
+
+                address1 == address2 false
+                address1.equals(address2) false
+
+                equals @overide해서 사용
+             */
             em.persist(user2);
 
             tx.commit();
