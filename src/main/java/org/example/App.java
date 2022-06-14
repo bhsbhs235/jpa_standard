@@ -8,6 +8,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Hello world!
@@ -211,17 +212,18 @@ public class App
 
             em.persist(user);*/
 
+            /*
             Address address = new Address("city", "street", "zipcode");
             User user = new User();
             user.setUsername("hello");
-            user.setAddress(address);
+            user.setHomeAddress(address);
             user.setPeriod(new Period());
 
             Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
             User user2 = new User();
             user2.setUsername("hello");
             //user2.setAddress(address);
-            user2.setAddress(copyAddress); //복사해서 쓰자
+            user2.setHomeAddress(copyAddress); //복사해서 쓰자
             user2.setPeriod(new Period());
 
             em.persist(user);
@@ -254,7 +256,51 @@ public class App
 
                 equals @overide해서 사용
              */
-            em.persist(user2);
+            /*em.persist(user2);
+            */
+
+            /*
+            User user = new User();
+            user.setUsername("user");
+            user.setHomeAddress(new Address("city", "street", "zipcode"));
+
+            user.getFavoriteFoods().add("피자");
+            user.getFavoriteFoods().add("족발");
+            user.getFavoriteFoods().add("치킨");
+
+            //user.getAddressList().add(new Address("city2", "street2", "zipcode2"));
+            //user.getAddressList().add(new Address("city3", "street3", "zipcode3"));
+            user.getAddressList().add(new AddressEntity("city2", "street2", "zipcode2"));
+            user.getAddressList().add(new AddressEntity("city3", "street3", "zipcode3"));
+            em.persist(user);
+
+            em.flush();
+            em.clear();
+
+            User u = em.find(User.class, user.getId());
+
+            List<Address> addressList = u.getAddressList();
+
+            addressList.forEach(System.out::println); // 지연 로딩이라 사용해줄 때 조회함
+
+            Set<String> favoriteFoods = u.getFavoriteFoods();
+
+            favoriteFoods.forEach(System.out::println); // 지연 로딩이라 사용해줄 때 조회함
+
+            // u.getHomeAddress().setCity("newCity") // 아주 위험한 방법
+
+            Address a = u.getHomeAddress();
+            u.setHomeAddress(new Address("new City", a.getStreet(), a.getZipcode())); // 교체하는 느낌으로 가야함 딱 그 값만 바꾸려고 set을 두면 사이드 이팩트가 너무 큼
+
+            // 치킨 -> 떡볶이
+            u.getFavoriteFoods().remove("치킨");
+            u.getFavoriteFoods().add("떡볶이"); // 처럼 업데이트 한단 느낌보단 갈아 끼움
+
+            u.getAddressList().remove(new Address("city2", "street2", "zipcode2")); // equals가 구현이 안되어 있으면 해당 값 타입을 못찾아 지워지지 않는다.
+            u.getAddressList().add(new Address("aaci다ty", "aastreet", "aazipcode")); // 같이 업데이트 한단 느낌보단 갈아 끼움
+
+            Address(값 타입)을 엔티티(AddressEntity)로 관리하면 식별자가 있어 업데이트 할 때도 유리하다.
+            */
 
             tx.commit();
 
