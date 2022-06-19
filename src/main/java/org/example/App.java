@@ -6,6 +6,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.nio.channels.FileChannel;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Set;
@@ -301,6 +305,40 @@ public class App
 
             Address(값 타입)을 엔티티(AddressEntity)로 관리하면 식별자가 있어 업데이트 할 때도 유리하다.
             */
+
+            em.createQuery("select m from Member m where m.name like '%kim%'",
+                    Member.class).getResultList();
+
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Member> query = cb.createQuery(Member.class);
+
+            Root<Member> m = query.from(Member.class);
+
+            CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("name"), "kim"));
+            List<Member> resultList = em.createQuery(cq).getResultList();
+
+            /*
+                JPQL
+                - 테이블이 아닌 객체를 대상으로 검색하는 객체 지향 쿼리
+                - SQL을 추상화해서 특정 데이터베이스 SQL에 의존 X
+                - JPQL을 한마디로 정의하면 객체 지향 SQL
+             */
+            /*
+                Criteria
+                - 문자가 아 자바코드로 JPQL을 작성할 수 있음
+                - JPQL 빌더 역할
+                - JPA 공식 기능
+                - 단점 : 너무 복잡하고 실용성이 없다
+                - Criteria 대신에 QueryDSL사용 권장
+             */
+            /*
+                QueryDSL 소개
+                - 문자가 아닌 자바코드로 JPQL을 작성할 수 있음
+                - JPQL 빌더 역할
+                - 컴파일 시점에 문법 오류를 찾을 수 있음
+                - 동적쿼리 작성 편리함
+                - 단순하고 쉬움
+             */
 
             tx.commit();
 

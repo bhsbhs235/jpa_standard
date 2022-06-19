@@ -18,7 +18,11 @@ public class Address {
 
     private String zipcode;
 
-    @Override // equals hashCode는 걍 무조건 넣어주자 이 담에 사이드이팩트 생기는 위험을 줄여준다
+    public String fullAddress(){
+        return getCity() + "/" + getStreet() + "/" + getZipcode();
+    }
+
+    @Override // equals hashCode는 걍 무조건 넣어주자 이 담에 사이드이팩트 생기는 위험을 줄여준다 ( use getter ... )
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
