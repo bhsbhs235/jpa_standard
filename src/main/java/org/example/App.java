@@ -2,10 +2,7 @@ package org.example;
 
 import org.hibernate.Hibernate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -306,6 +303,7 @@ public class App
             Address(값 타입)을 엔티티(AddressEntity)로 관리하면 식별자가 있어 업데이트 할 때도 유리하다.
             */
 
+            /*
             em.createQuery("select m from Member m where m.name like '%kim%'",
                     Member.class).getResultList();
 
@@ -316,12 +314,30 @@ public class App
 
             CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("name"), "kim"));
             List<Member> resultList = em.createQuery(cq).getResultList();
+            */
+
+            /*
+            TypedQuery<Member> query = em.createQuery("select m from Member m where m.name = :name", Member.class);
+            List<Member> result = query.getResultList();
+
+            Member result2 = query.getSingleResult(); // 결과가 하나 일 때
+            // 결과가 없으면 NoResultException
+            // 둘 이상이면 NonUniqueResultException
+            */
+
+            Member result = em.createQuery("select m from Member m where m.name = :name", Member.class)
+                    .setParameter("name", "member1")
+                    .getSingleResult();
 
             /*
                 JPQL
                 - 테이블이 아닌 객체를 대상으로 검색하는 객체 지향 쿼리
                 - SQL을 추상화해서 특정 데이터베이스 SQL에 의존 X
                 - JPQL을 한마디로 정의하면 객체 지향 SQL
+
+                - JPQL은 객체지향 쿼리 언어다. 따라서 테이블을 대상으로 쿼리 하는 것이 아니라 엔티티 객체를 대상으로 쿼리한다.
+                - JPQL은 SQL을 추상화해서 특정데이터베이스 SQL에 의존하지 않는다.
+                - JPQL은 결국 SQL로 변환된다.
              */
             /*
                 Criteria
