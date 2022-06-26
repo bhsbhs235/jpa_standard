@@ -325,9 +325,70 @@ public class App
             // 둘 이상이면 NonUniqueResultException
             */
 
-            Member result = em.createQuery("select m from Member m where m.name = :name", Member.class)
+            /*Member result = em.createQuery("select m from Member m where m.name = :name", Member.class)
                     .setParameter("name", "member1")
-                    .getSingleResult();
+                    .getSingleResult();*/
+
+            //List<Team> result = em.createQuery("select m.team from Member m ", Team.class).getResultList(); 보다는 아래를 지향
+            /*List<Team> result = em.createQuery("select t from Member m join m.team t", Team.class)
+                    .getResultList();*/
+
+            // em.createQuery("select u.homeAddress from User u ").getResultList(); 임베디드 타입도 가능
+
+            /*List resultList = em.createQuery("select m.name, m.age from Member m ").getResultList();
+
+            Object o = resultList.get(0);
+            Object[] result = (Object[]) o;
+            System.out.println("name = " + result[0]);
+            System.out.println("age = " + result[1]);*/
+
+            Team team = new Team();
+            team.setName("team1");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setName("member1");
+            member.setAge(10);
+            member.setTeam(team);
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            /*List<MemberDTO> resultList = em.createQuery("select new org.example.MemberDTO(m.name, m.age) from Member m", MemberDTO.class).getResultList();
+            MemberDTO memberDTO = resultList.get(0);
+            System.out.println(" name = " + memberDTO.getName());
+            System.out.println(" age = " + memberDTO.getAge());*/
+
+            /*
+                DTO로 바로 조회
+                패키지 명을 포함한 전체 클래스 명입력
+                순서와 타입이 일치하는 "생성자" 필요
+
+             */
+
+            /*for(int i=0; i< 100; i++) {
+                Member member = new Member();
+                member.setName("member" + i);
+                member.setAge(10+i);
+                em.persist(member);
+            }
+
+            List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(0) // 조회 시작 위치
+                    .setMaxResults(10) // offset
+                    .getResultList();
+            for(Member member1 : result){
+                System.out.println("member1 = " + member1);
+            }*/
+
+            String query = "select m from Member m inner join m.team t";
+            List<Member> result = em.createQuery(query, Member.class)
+                    .getResultList();
+
+
+
 
             /*
                 JPQL

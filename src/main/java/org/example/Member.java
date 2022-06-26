@@ -3,6 +3,7 @@ package org.example;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -60,6 +61,18 @@ public class Member {
         team.getMembers().add(this);
     }
 
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", roleType=" + roleType +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                ", description='" + description + '\'' +
+                '}';
+    }
 
     /*
         지연로딩 즉시로딩
