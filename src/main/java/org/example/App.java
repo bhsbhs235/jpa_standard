@@ -346,12 +346,28 @@ public class App
             team.setName("team1");
             em.persist(team);
 
+            Team team2 = new Team();
+            team.setName("team2");
+            em.persist(team2);
+
             Member member = new Member();
             member.setName("member1");
             member.setAge(10);
             member.setTeam(team);
 
+            Member member2 = new Member();
+            member2.setName("member2");
+            member2.setAge(20);
+            member2.setTeam(team);
+
+            Member member3 = new Member();
+            member3.setName("member3");
+            member3.setAge(30);
+            member3.setTeam(team2);
+
             em.persist(member);
+            em.persist(member2);
+            em.persist(member3);
 
             em.flush();
             em.clear();
@@ -383,11 +399,67 @@ public class App
                 System.out.println("member1 = " + member1);
             }*/
 
-            String query = "select m from Member m inner join m.team t";
+           /* String query = "select m from Member m inner join m.team t";
             List<Member> result = em.createQuery(query, Member.class)
                     .getResultList();
 
+            for(Member tmp : result){
+                System.out.println("member = " + tmp.getName() + ", Team = " + tmp.getTeam().getName());
+            }*/
 
+            /*String query = "select function('group_concat', m.name) From Member m";
+            List<String> result = em.createQuery(query, String.class).getResultList();
+
+            for(String s: result){
+                System.out.println(s);
+            }*/
+
+            //String query = "select m.team from Member m";
+            // 해당 JPQL문은 묵시적 INNER JOIN이 발생하기 때문에 나중에 성능이 저하 될 수 있다.
+            //List<Team> result = em.createQuery(query, Team.class).getResultList();
+
+           /* String query = "select m.name from Team t join t.members m";
+            List<Team> result = em.createQuery(query, Team.class).getResultList();*/
+
+            // *중요* 걍 묵시적 조인 쓰지말고 명시적으로 조인 해줘라!!
+
+            /*
+               경로 탐색 (예 m.team) 을 사용한 묵시적 조인 시 주의사항
+               - 항상 내부 조인 Inner join
+               - 컬렉션 (Many 다 인 부분) 은 경로 탐색의 끝, 명시적 조인을 통해 별칭을 얻어야함
+                String query = "select t.members.name from Team t "; // 못함 size밖에 못구함
+                String query = "select t.members.name from Team t join t.members m";
+                List<Team> result = em.createQuery(query, Team.class).getResultList();
+
+               - 경로 탐색은 주로 SELECT, WHERE 절에서 사용하지만 묵시적 조인으로 인해 SQL의 FROM 절에 영향을 줌
+             */
+
+            /*
+                JPA 는 WHERE HAVING 절에서만 서브 쿼리 사용 가능
+                FROM 절의 서브 쿼리는 불가능(조인으로 풀 수 있으면 풀어서 해결)
+
+                서브 쿼리 예
+                select m from Member m
+                where m.age > ( select avg(m2.age) from Member m2 )
+
+                서브 쿼리 지원 함수
+                - (NOT) EXISTS : 서브쿼리에 결과가 존재하면 참
+                - ALL : 모두 만족하면 참
+                - ANY, SOME : 조건을 하나라도 만족하면 참
+                - (NOT) IN : 서브쿼리의 결과 중 하나라도 같은 것이 있으면 참
+
+                teamA 소속인 회원
+                select m from Member m
+                where exists ( select t from m.team t where t.name = "teamA" )
+
+                전체 상품 각각의 재고보다 주문량이 많은 주문들
+                select o from Order o
+                where o.orderAmount > ALL ( select p.stockAmount from Product p )
+
+                어떤 팀이든 팀에 소속된 회원
+               select m from Member m
+                where m.team = ANY ( select t from Team t )
+             */
 
 
             /*
@@ -416,6 +488,51 @@ public class App
                 - 동적쿼리 작성 편리함
                 - 단순하고 쉬움
              */
+
+            /*String query = "select m from Member m";
+            List<Member> result = em.createQuery(query, Member.class).getResultList();
+
+            for(Member tmp : result){
+                System.out.println("member = " + tmp.getName() + ", Team = " + tmp.getTeam().getName());
+                // LAZY 방식
+                // member1 team1 을 가져옴
+                // member2 team1 은 캐쉬에서 가져옴
+                // member3 team2 를 다시 가져옴
+            }
+
+            String query2 = "select m from Member m join fetch m.team";
+            fetch 조인으로 즉시 다 가져온(즉시 로딩)
+             */
+
+             /*String query = "select t from Team t join fetch t.members";
+             List<Team> result = em.createQuery(query, Team.class).getResultList();
+
+             for(Team t : result){
+                 System.out.println("team  = " + team.getName() + " members size = " + team.getMembers().size());
+                 for(Member m : t.getMembers()){
+                     System.out.println("member = " + m.getName());
+                 }
+                 // team1 2번
+                 // team2 1번 표출됨
+                 // WHY? inner join하면 member 수만큼 로우가 생기기 때문 N:1 1 부분을 JOIN하면 데이터가 뻥튀기 될 수 있다
+             }*/
+
+             /*
+              페치 조인 주의 사항
+              - 페치 조인 대상에는 별칭을 줄 수 없다.
+              - 둘 이상의 컬렉션은 페치 조인 할 수 없다
+              - 컬렉션을 페치 조인하면 페이징 API(setFirstResult, setMaxResults)를 사용할 수 없다. ( 위에 처럼 데이터 뻥튀기 돼기 때문에 )
+
+              select t from Team t join fetch t.members m where m.age > 10 이런 문법 최대한 안쓰도록 하자!
+
+              - 연관된 엔티티들을 SQL 한 번으로 조회 - 성능 최적화
+              - 엔티티에 직접 적용하는 글로벌 로딩전략보다 우선함 (@OneToMany(fetch = FetchType.LAZY)
+              - 실무에서 글로벌 로딩 전략은 모두 지연 로딩
+              - 최적화가 필요한 곳은 페치 조인 적용
+               */
+
+            em.createNamedQuery("Member.findByName", Member.class).setParameter("name", "member1").getResultList();
+
 
             tx.commit();
 
