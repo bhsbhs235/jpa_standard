@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.sound.midi.Soundbank;
 import java.nio.channels.FileChannel;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
@@ -531,9 +532,34 @@ public class App
               - 최적화가 필요한 곳은 페치 조인 적용
                */
 
-            em.createNamedQuery("Member.findByName", Member.class).setParameter("name", "member1").getResultList();
+            //em.createNamedQuery("Member.findByName", Member.class).setParameter("name", "member1").getResultList();
 
+            // 자동 FLUSH 됨
+            int resultCount = em.createQuery("update Member m set m.age = 20").executeUpdate();
+            System.out.println("resultCount = " + resultCount);
 
+            System.out.println("member.getAge() = " + member.getAge());
+            System.out.println("member2.getAge() = " + member2.getAge());
+            System.out.println("member3.getAge() = " + member3.getAge());
+
+            em.clear();
+            // 1. flush
+            // 2. update 쿼리 (DB에만 반영된다)
+            // 3. 영속성 컨텍스트에 있는 그대로 들고 오기 때문에 member age 값은 초기 값이다
+            // 4. 따라서 clear해주고 다시 조회를 해야한다
+
+            String query = "select m from Member m";
+            List<Member> result = em.createQuery(query, Member.class).getResultList();
+
+            for(Member tmp : result){
+                System.out.println("member.getAge() = " + tmp.getAge());
+            }
+
+            /*
+                벌크 연산 주의
+                - 벌크 연산은 영속성 컨텍스트를 무시하고 데이터베이스에 직접 쿼리
+                 따라서 1. 벌크 연산을 가장 먼저 실행 또는 2. 벌크 연산 수행 후 영속성 컨테스트 초기화
+            */
             tx.commit();
 
         }catch (Exception e){
